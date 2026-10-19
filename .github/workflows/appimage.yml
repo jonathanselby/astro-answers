@@ -1,0 +1,97 @@
+name: Build AppImage
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/appimage.yml
+
+permissions:
+  contents: read
+
+jobs:
+  build-appimage:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.25.x
+
+      - name: Build Astro Answers
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p AppDir/usr/bin
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+            go build -trimpath -ldflags='-s -w' \
+            -o AppDir/usr/bin/AstroAnswers ./cmd/astroanswers
+
+      - name: Create AppDir
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cat > AppDir/AppRun <<'EOF'
+          #!/bin/sh
+          set -eu
+          data_dir="${XDG_DATA_HOME:-$HOME/.local/share}/astro-answers"
+          mkdir -p "$data_dir"
+          cd "$data_dir"
+          exec "$APPDIR/usr/bin/AstroAnswers" "$@"
+          EOF
+          chmod +x AppDir/AppRun
+
+          cat > AppDir/AstroAnswers.desktop <<'EOF'
+          [Desktop Entry]
+          Type=Application
+          Name=Astro Answers
+          Comment=The answer is the weapon
+          Exec=AstroAnswers
+          Icon=astro-answers
+          Categories=Game;Education;
+          Terminal=false
+          X-AppImage-Name=Astro Answers
+          X-AppImage-Version=0.1.0
+          X-AppImage-Arch=x86_64
+          EOF
+
+          cp cmd/astroanswers/assets/station.png AppDir/astro-answers.png
+          ln -s astro-answers.png AppDir/.DirIcon
+
+      - name: Build AppImage
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -L --fail --retry 3 \
+            -o appimagetool-x86_64.AppImage \
+            https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool-x86_64.AppImage
+          ARCH=x86_64 APPIMAGE_EXTRACT_AND_RUN=1 \
+            ./appimagetool-x86_64.AppImage AppDir AstroAnswers-x86_64.AppImage
+          chmod +x AstroAnswers-x86_64.AppImage
+
+      - name: Verify AppImage contents
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./AstroAnswers-x86_64.AppImage --appimage-extract >/dev/null
+          test -x squashfs-root/AppRun
+          test -x squashfs-root/usr/bin/AstroAnswers
+          test -f squashfs-root/AstroAnswers.desktop
+          test -f squashfs-root/astro-answers.png
+          rm -rf squashfs-root
+          file AstroAnswers-x86_64.AppImage
+          sha256sum AstroAnswers-x86_64.AppImage
+
+      - name: Upload AppImage
+        uses: actions/upload-artifact@v4
+        with:
+          name: AstroAnswers-x86_64-AppImage
+          path: AstroAnswers-x86_64.AppImage
+          if-no-files-found: error
+          retention-days: 30
