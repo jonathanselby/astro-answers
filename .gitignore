@@ -1,0 +1,4 @@
+/bin/
+/scores.json
+*.tmp
+.DS_Store
