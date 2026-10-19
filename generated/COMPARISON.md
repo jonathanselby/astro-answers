@@ -1,6 +1,6 @@
 # Astro Answers — Design / Implementation Comparison
 
-**Implementation evidence:** `fba80594deed4d8083152f15bea5ce8b5be94ff3`  
+**Implementation evidence:** `5acdc382a4bc51a6e617a525f3ad4ac108cbde10`  
 **Generated:** 2026-10-19
 
 | Design area | Intended contract | Recovered implementation | Assessment |
