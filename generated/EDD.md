@@ -1,6 +1,6 @@
 # Astro Answers — Generated Engineering Design Document
 
-**Evidence commit:** `fba80594deed4d8083152f15bea5ce8b5be94ff3`  
+**Evidence commit:** `5acdc382a4bc51a6e617a525f3ad4ac108cbde10`  
 **Method:** code-derived review using the Jonno's Garage `codebase-to-EDD` evidence discipline  
 **Generated:** 2026-10-19
 
