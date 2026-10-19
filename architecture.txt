@@ -1,0 +1,56 @@
+ASTRO ANSWERS V0.1
+==================
+
+                         KEYBOARD
+                            |
+                            v
+                  +-------------------+
+                  |   Ebitengine app  |
+                  | input / draw/audio|
+                  +---------+---------+
+                            | Input
+                            v
+                  +-------------------+
+                  |       Game        |
+                  | authoritative     |
+                  | runtime state     |
+                  +----+----+----+----+
+                       |    |    |
+          +------------+    |    +-------------+
+          |                 |                  |
+          v                 v                  v
+      input match        move/wrap       station collision
+          |                 |                  |
+          v                 |                  v
+      hit by ID             |               shield
+          |                 |
+          v                 |
+      split/remove          |
+          +--------+--------+
+                   |
+                   v
+             wave progression
+
+Game state
+----------
+Screen / Mode / Wave / Score / Shield
+[]Rock / Typed prefix / run counters
+seeded gameplay RNG / separate cosmetic RNG
+[]Particle / HighScores / Initials
+
+Persistence
+-----------
+                  +-------------------+
+                  |    scores.json    |
+                  | two top-five lists|
+                  +-------------------+
+
+Embedded content
+----------------
+words.txt + multiplication generation
+4 PNG sprites + 9 WAV cues + Go font data
+
+Deliberately absent
+-------------------
+no event bus, service layer, repository abstraction, physics framework,
+UI framework, network service, account system, telemetry or runtime AI
